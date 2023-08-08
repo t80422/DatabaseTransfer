@@ -1443,7 +1443,7 @@
     <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>資料庫轉檔 v0.4</value>
+    <value>資料庫轉檔 v0.5</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>frmMain</value>

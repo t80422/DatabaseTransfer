@@ -79,6 +79,7 @@ Partial Class frmSetFormat
         Me.btnSave = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.btnClear = New System.Windows.Forms.Button()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.grpInfoFormat.SuspendLayout()
         CType(Me.nudAttendanceID, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpDateFormat.SuspendLayout()
@@ -237,6 +238,7 @@ Partial Class frmSetFormat
         'grpDateFormat
         '
         Me.grpDateFormat.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.grpDateFormat.Controls.Add(Me.LinkLabel1)
         Me.grpDateFormat.Controls.Add(Me.llbSecond)
         Me.grpDateFormat.Controls.Add(Me.llbMinute)
         Me.grpDateFormat.Controls.Add(Me.llbHour)
@@ -268,7 +270,7 @@ Partial Class frmSetFormat
         'llbMinute
         '
         Me.llbMinute.AutoSize = True
-        Me.llbMinute.Location = New System.Drawing.Point(658, 23)
+        Me.llbMinute.Location = New System.Drawing.Point(684, 23)
         Me.llbMinute.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.llbMinute.Name = "llbMinute"
         Me.llbMinute.Size = New System.Drawing.Size(40, 16)
@@ -280,7 +282,7 @@ Partial Class frmSetFormat
         'llbHour
         '
         Me.llbHour.AutoSize = True
-        Me.llbHour.Location = New System.Drawing.Point(540, 23)
+        Me.llbHour.Location = New System.Drawing.Point(592, 23)
         Me.llbHour.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.llbHour.Name = "llbHour"
         Me.llbHour.Size = New System.Drawing.Size(40, 16)
@@ -292,7 +294,7 @@ Partial Class frmSetFormat
         'llbDay
         '
         Me.llbDay.AutoSize = True
-        Me.llbDay.Location = New System.Drawing.Point(422, 23)
+        Me.llbDay.Location = New System.Drawing.Point(500, 23)
         Me.llbDay.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.llbDay.Name = "llbDay"
         Me.llbDay.Size = New System.Drawing.Size(40, 16)
@@ -304,7 +306,7 @@ Partial Class frmSetFormat
         'llbMonth
         '
         Me.llbMonth.AutoSize = True
-        Me.llbMonth.Location = New System.Drawing.Point(304, 23)
+        Me.llbMonth.Location = New System.Drawing.Point(408, 23)
         Me.llbMonth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.llbMonth.Name = "llbMonth"
         Me.llbMonth.Size = New System.Drawing.Size(40, 16)
@@ -316,7 +318,7 @@ Partial Class frmSetFormat
         'llbROCYear
         '
         Me.llbROCYear.AutoSize = True
-        Me.llbROCYear.Location = New System.Drawing.Point(154, 23)
+        Me.llbROCYear.Location = New System.Drawing.Point(284, 23)
         Me.llbROCYear.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.llbROCYear.Name = "llbROCYear"
         Me.llbROCYear.Size = New System.Drawing.Size(72, 16)
@@ -712,6 +714,18 @@ Partial Class frmSetFormat
         Me.btnClear.Text = "清除"
         Me.btnClear.UseVisualStyleBackColor = False
         '
+        'LinkLabel1
+        '
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.Location = New System.Drawing.Point(128, 23)
+        Me.LinkLabel1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(104, 16)
+        Me.LinkLabel1.TabIndex = 13
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Tag = "23"
+        Me.LinkLabel1.Text = "[西元後兩碼]"
+        '
         'frmSetFormat
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -806,4 +820,5 @@ Partial Class frmSetFormat
     Friend WithEvents btnSave As Button
     Friend WithEvents Button2 As Button
     Friend WithEvents btnClear As Button
+    Friend WithEvents LinkLabel1 As LinkLabel
 End Class

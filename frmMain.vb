@@ -84,8 +84,8 @@ Finish:
             For Each row As DataRow In dt.Rows
                 '取得資料格式
                 Dim dataString = txtFormat.Text
+                Dim dic = GetValueFromColumn(row)
                 For Each match As Match In matches
-                    Dim dic = GetValueFromColumn(row)
                     '替換文字
                     dataString = Regex.Replace(dataString, Regex.Escape(match.Value), dic(match.Groups(1).Value))
                 Next
@@ -125,6 +125,7 @@ Finish:
     Private Function ReplaceDate(fileName As String) As String
         Dim replaceDict As New Dictionary(Of String, String) From {
             {"[西元年]", Now.Year.ToString()},
+            {"[西元後兩碼]", Now.Year.ToString().Substring(2)},
             {"[民國年]", (Now.Year - 1911).ToString()},
             {"[月]", Now.Month.ToString("D2")},
             {"[日]", Now.Day.ToString("D2")},
@@ -195,6 +196,7 @@ Finish:
         dic.Add("考勤狀態", status)
         Dim day = Date.Parse(dr("swip_card_rev_time"))
         dic.Add("西元年", day.Year)
+        dic.Add("西元後兩碼", Now.Year.ToString().Substring(2))
         dic.Add("民國年", day.Year - 1911)
         dic.Add("月", day.Month.ToString("D2"))
         dic.Add("日", day.Day.ToString("D2"))
