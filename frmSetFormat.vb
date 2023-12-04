@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Text
 Imports System.Text.RegularExpressions
 
 Public Class frmSetFormat
@@ -11,82 +12,149 @@ Public Class frmSetFormat
         '初始化ComboBox
         cmbAttendanceID.SelectedIndex = 0
         cmbCardID.SelectedIndex = 0
-        cmbID.SelectedIndex = 0
 
         '讀取設定紀錄
-        Dim streamReader = New StreamReader(formatSetPath)
-        Dim line = streamReader.ReadLine
-        While line IsNot Nothing
-            Dim data = Split(line, ":", 2)
-            Dim s As String()
+        Using streamReader = New StreamReader(formatSetPath)
+            Dim line = streamReader.ReadLine
 
-            Select Case data(0)
-                Case "格式"
-                    txtFormat.Text = data(1)
+            While line IsNot Nothing
+                Dim data = Split(line, ":", 2)
+                Dim s As String()
 
-                Case "結果"
-                    txtResult.Text = data(1)
+                Select Case data(0)
+                    Case "格式"
+                        txtFormat.Text = data(1)
 
-                Case "考勤號碼"
-                    s = Split(data(1), ",")
-                    chkAttendanceID.Checked = s(0)
-                    nudAttendanceID.Value = s(1)
-                    cmbAttendanceID.SelectedIndex = cmbAttendanceID.FindStringExact(s(2))
-                    txtAttendanceID.Text = s(3)
+                    Case "結果"
+                        txtResult.Text = data(1)
 
-                Case "卡片號碼"
-                    s = Split(data(1), ",")
-                    chkCardID.Checked = s(0)
-                    nudCardID.Value = s(1)
-                    cmbCardID.SelectedIndex = cmbCardID.FindStringExact(s(2))
-                    txtCardID.Text = s(3)
+                    Case "考勤號碼"
+                        s = Split(data(1), ",")
+                        chkAttendanceID.Checked = s(0)
+                        nudAttendanceID.Value = s(1)
+                        cmbAttendanceID.SelectedIndex = cmbAttendanceID.FindStringExact(s(2))
+                        txtAttendanceID.Text = s(3)
 
-                Case "編號"
-                    s = Split(data(1), ",")
-                    chkID.Checked = s(0)
-                    nudID.Value = s(1)
-                    cmbID.SelectedIndex = cmbID.FindStringExact(s(2))
-                    txtID.Text = s(3)
+                    Case "卡片號碼"
+                        s = Split(data(1), ",")
+                        chkCardID.Checked = s(0)
+                        nudCardID.Value = s(1)
+                        cmbCardID.SelectedIndex = cmbCardID.FindStringExact(s(2))
+                        txtCardID.Text = s(3)
 
-                Case "上班"
-                    txtCheckIn.Text = data(1)
+                    Case "上班"
+                        txtCheckIn.Text = data(1)
 
-                Case "下班"
-                    txtCheckOut.Text = data(1)
+                    Case "下班"
+                        txtCheckOut.Text = data(1)
 
-                Case "開始休息"
-                    txtStartRest.Text = data(1)
+                    Case "開始休息"
+                        txtStartRest.Text = data(1)
 
-                Case "結束休息"
-                    txtEndRest.Text = data(1)
+                    Case "結束休息"
+                        txtEndRest.Text = data(1)
 
-                Case "開始加班"
-                    txtCheckIn_overtime.Text = data(1)
+                    Case "開始加班"
+                        txtCheckIn_overtime.Text = data(1)
 
-                Case "結束加班"
-                    txtCheckOut_overtime.Text = data(1)
+                    Case "結束加班"
+                        txtCheckOut_overtime.Text = data(1)
 
-                Case "其他"
-                    txtElse.Text = data(1)
+                    Case "其他"
+                        txtElse.Text = data(1)
 
-                Case Else
+                    Case "自訂欄位1"
+                        nudCustom1.Value = data(1)
 
-            End Select
-            line = streamReader.ReadLine
-        End While
-        streamReader.Close()
+                    Case "自訂欄位2"
+                        nudCustom2.Value = data(1)
 
+                    Case Else
+
+                End Select
+
+                line = streamReader.ReadLine
+            End While
+
+            streamReader.Close()
+        End Using
     End Sub
+
+    'Private Sub LinkLabel_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
+    '    Dim linkLabel As LinkLabel = CType(sender, LinkLabel)
+    '    Dim insertText As String = linkLabel.Text
+    '    Dim insertPos As Integer = txtFormat.SelectionStart
+
+    '    ' 進行插入或移除操作
+    '    InsertOrRemoveText(insertText, insertPos)
+    'End Sub
+
+    'Private Sub InsertOrRemoveText(insertText As String, insertPos As Integer)
+    '    ' 檢查insertText是否已出現在txtFormat中
+    '    If txtFormat.Text.Contains(insertText) Then
+    '        ' 移除文字
+    '        txtFormat.Text = txtFormat.Text.Replace(insertText, "")
+    '    Else
+    '        ' 如果insertText未出現，檢查插入點是否在方括號[]之外
+    '        If Not IsInsertionPointInsideBrackets(txtFormat.Text, insertPos) Then
+    '            ' 在插入點添加文字
+    '            txtFormat.Text = txtFormat.Text.Substring(0, insertPos) & insertText & txtFormat.Text.Substring(insertPos)
+    '            ' 更新游標位置
+    '            txtFormat.SelectionStart = insertPos + insertText.Length
+    '        End If
+    '    End If
+    'End Sub
+
+
+    'Private Function IsInsertionPointInsideBrackets(text As String, position As Integer) As Boolean
+    '    Dim bracketDepth As Integer = 0
+
+    '    For i As Integer = 0 To position - 1
+    '        If text(i) = "[" Then
+    '            bracketDepth += 1
+    '        ElseIf text(i) = "]" Then
+    '            If bracketDepth > 0 Then
+    '                bracketDepth -= 1
+    '            End If
+    '        End If
+    '    Next
+
+    '    Return bracketDepth > 0
+    'End Function
 
     Private Sub LinkLabel_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
-        Dim linkLabel As LinkLabel = sender
-        Dim formatParts As String() = txtFormat.Text.Split(","c)
-        If formatParts.Contains(linkLabel.Text) Then
-            txtFormat.Text = String.Join(",", formatParts.Where(Function(part) part <> linkLabel.Text))
-        Else
-            txtFormat.Text = If(String.IsNullOrEmpty(txtFormat.Text), linkLabel.Text, $"{txtFormat.Text},{linkLabel.Text}")
-        End If
+        Dim linkLabel As LinkLabel = CType(sender, LinkLabel)
+        InsertOrRemoveText(linkLabel.Text, txtFormat.SelectionStart)
     End Sub
+
+    Private Sub InsertOrRemoveText(insertText As String, insertPos As Integer)
+        Dim formatText As New StringBuilder(txtFormat.Text)
+
+        If formatText.ToString().Contains(insertText) Then
+            formatText.Replace(insertText, "")
+        ElseIf Not IsInsertionPointInsideBrackets(formatText.ToString(), insertPos) Then
+            formatText.Insert(insertPos, insertText)
+            insertPos += insertText.Length
+        End If
+
+        txtFormat.Text = formatText.ToString()
+        txtFormat.SelectionStart = insertPos
+    End Sub
+
+    Private Function IsInsertionPointInsideBrackets(text As String, position As Integer) As Boolean
+        Dim bracketDepth As Integer = 0
+
+        For i As Integer = 0 To position - 1
+            If text(i) = "["c Then
+                bracketDepth += 1
+            ElseIf text(i) = "]"c Then
+                bracketDepth -= 1
+                If bracketDepth < 0 Then Exit For
+            End If
+        Next
+
+        Return bracketDepth > 0
+    End Function
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
         txtFormat.Clear()
@@ -122,28 +190,27 @@ Public Class frmSetFormat
         ElseIf chkCardID.Checked AndAlso cmbCardID.SelectedIndex = -1 Then
             MsgBox($"請選擇 卡片號碼不足{nudCardID.Value}位時在 [哪裡] 補 {txtCardID.Text}")
             Exit Sub
-
-        ElseIf chkID.Checked AndAlso cmbID.SelectedIndex = -1 Then
-            MsgBox($"請選擇 編號不足{nudID.Value}位時在 [哪裡] 補 {txtID.Text}")
-            Exit Sub
         End If
 
-        Dim streamWriter As New StreamWriter(formatSetPath)
-        With streamWriter
-            .WriteLine($"格式:{txtFormat.Text}")
-            .WriteLine($"結果:{txtResult.Text}")
-            .WriteLine($"考勤號碼:{chkAttendanceID.Checked},{nudAttendanceID.Value},{cmbAttendanceID.Text},{txtAttendanceID.Text}")
-            .WriteLine($"卡片號碼:{chkCardID.Checked},{nudCardID.Value},{cmbCardID.Text},{txtCardID.Text}")
-            .WriteLine($"編號:{chkID.Checked},{nudID.Value},{cmbID.Text},{txtID.Text}")
-            .WriteLine($"上班:{txtCheckIn.Text}")
-            .WriteLine($"下班:{txtCheckOut.Text}")
-            .WriteLine($"開始休息:{txtStartRest.Text}")
-            .WriteLine($"結束休息:{txtEndRest.Text}")
-            .WriteLine($"開始加班:{txtCheckIn_overtime.Text}")
-            .WriteLine($"結束加班:{txtCheckOut_overtime.Text}")
-            .WriteLine($"其他:{txtElse.Text}")
-            .Close()
-        End With
+        Using streamWriter As New StreamWriter(formatSetPath)
+            With streamWriter
+                .WriteLine($"格式:{txtFormat.Text}")
+                .WriteLine($"結果:{txtResult.Text}")
+                .WriteLine($"考勤號碼:{chkAttendanceID.Checked},{nudAttendanceID.Value},{cmbAttendanceID.Text},{txtAttendanceID.Text}")
+                .WriteLine($"卡片號碼:{chkCardID.Checked},{nudCardID.Value},{cmbCardID.Text},{txtCardID.Text}")
+                .WriteLine($"上班:{txtCheckIn.Text}")
+                .WriteLine($"下班:{txtCheckOut.Text}")
+                .WriteLine($"開始休息:{txtStartRest.Text}")
+                .WriteLine($"結束休息:{txtEndRest.Text}")
+                .WriteLine($"開始加班:{txtCheckIn_overtime.Text}")
+                .WriteLine($"結束加班:{txtCheckOut_overtime.Text}")
+                .WriteLine($"其他:{txtElse.Text}")
+                .WriteLine($"自訂欄位1:{nudCustom1.Value}")
+                .WriteLine($"自訂欄位2:{nudCustom2.Value}")
+                .Close()
+            End With
+        End Using
+
         frmMain.GetFormat()
         Close()
     End Sub

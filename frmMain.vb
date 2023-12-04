@@ -1,8 +1,6 @@
-﻿Imports System.Configuration
-Imports System.IO
+﻿Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
-Imports System.Threading
 Imports Npgsql
 
 Public Class frmMain
@@ -59,23 +57,23 @@ Finish:
     ''' <param name="endTime"></param>
     ''' <param name="auto">true:自動 false:手動</param>
     ''' <returns></returns>
-    Private Function ExportFile(startTime As String, endTime As String, auto As Boolean) As Boolean
-        Dim connectString = $"Server={txtIP.Text};Port=5432;Database=cms;username={txtUserName.Text};password={txtPsw.Text}"
-        connect = New NpgsqlConnection(connectString)
+    Private Function ExportFile(startTime As Date, endTime As Date, auto As Boolean) As Boolean
         Try
-            connect.Open()
-            Dim sql = "SELECT b.person_code, b.given_name, a.card_number, a.attendance_status, c.cr_name, b.family_name, a.swip_card_rev_time " +
-                               "FROM attendance.sync_event_record a, platform.person b, deviceaccess.card_reader c " +
-                               "WHERE a.card_read_id = c.id " +
-                               "AND a.person_id = b.id " +
-                             $"AND a.swip_card_rev_time >= '{startTime}' " +
-                             $"AND a.swip_card_rev_time <= '{endTime}' " +
-                               "AND a.auth_result = 1 " +
-                               "ORDER BY a.swip_card_rev_time"
-            Dim dt As New DataTable
-            Dim command = New NpgsqlCommand(sql, connect)
-            Dim adapter As New NpgsqlDataAdapter(command)
-            adapter.Fill(dt)
+            Dim sql = "SELECT b.person_code, b.given_name, a.card_number, a.attendance_status, c.cr_name, b.family_name, a.swip_card_rev_time, a.person_id " &
+                        "FROM attendance.sync_event_record a, platform.person b, deviceaccess.card_reader c " &
+                        "WHERE a.card_read_id = c.id " &
+                        "AND a.person_id = b.id " &
+                        "AND a.swip_card_rev_time >= @startTime " &
+                        "AND a.swip_card_rev_time <= @endTime " &
+                        "AND a.auth_result = 1 " &
+                        "ORDER BY a.swip_card_rev_time"
+            Dim dicData As New Dictionary(Of String, Object) From
+            {
+                {"startTime", startTime},
+                {"endTime", endTime}
+            }
+            Dim pgSQL = New PGSQL(txtIP.Text, txtUserName.Text, txtPsw.Text)
+            Dim dt = pgSQL.SelectTable(sql, dicData)
 
             '將資料打包
             Dim regex As New Regex("\[(.*?)\]")
@@ -85,6 +83,7 @@ Finish:
                 '取得資料格式
                 Dim dataString = txtFormat.Text
                 Dim dic = GetValueFromColumn(row)
+
                 For Each match As Match In matches
                     '替換文字
                     dataString = Regex.Replace(dataString, Regex.Escape(match.Value), dic(match.Groups(1).Value))
@@ -116,10 +115,25 @@ Finish:
             If Not auto Then MsgBox(result)
         Catch ex As Exception
             Dim msg = "轉出失敗 : " + ex.Message
+            Console.WriteLine(ex.StackTrace)
             LogMsg(msg)
             If Not auto Then MsgBox(msg)
         End Try
         Return True
+    End Function
+
+    Private Function GetCustomize(id As Integer, customID As Integer) As String
+        Dim pgSQL = New PGSQL(txtIP.Text, txtUserName.Text, txtPsw.Text)
+        Dim dic As New Dictionary(Of String, Object) From
+        {
+            {"id", id},
+            {"customID", customID}
+        }
+        Dim sql = "SELECT custom_value FROM platform.custom_field_person WHERE person_id = @id AND custom_id = @customID"
+        Dim rows = pgSQL.SelectTable(sql, dic).Rows
+        Dim result = If(rows.Count = 0, "", rows(0)("custom_value"))
+
+        Return result
     End Function
 
     Private Function ReplaceDate(fileName As String) As String
@@ -153,23 +167,29 @@ Finish:
             }
         Dim line = File.ReadAllLines(formatSetPath)
         Dim dicAttStatus As New Dictionary(Of String, String)
+
         For Each l In line
             Dim format = Split(l, ":")
             Select Case format(0)
                 Case "考勤號碼"
-                    dic.Add("考勤號碼", SetPad(format(1), dr("person_code")))
+                    dic.Add(format(0), SetPad(format(1), dr("person_code")))
 
                 Case "卡片號碼"
-                    dic.Add("卡片號碼", SetPad(format(1), dr("card_number")))
+                    dic.Add(format(0), SetPad(format(1), dr("card_number")))
 
-                Case "編號"
-                    dic.Add("編號", SetPad(format(1), dr("given_name")))
+                Case "自訂欄位1"
+                    If IsNumeric(format(1)) Then dic.Add(format(0), GetCustomize(dr("person_id"), format(1)))
+
+                Case "自訂欄位2"
+                    If IsNumeric(format(1)) Then dic.Add(format(0), GetCustomize(dr("person_id"), format(1)))
 
                 Case Else
                     dicAttStatus.Add(format(0), format(1))
             End Select
         Next
+
         Dim status As String = ""
+
         '考勤状态，默认0,0-未定义，1-上班，2-下班，3-开始休息，4-结束休息，5-开始加班，6-结束加班
         Select Case dr("attendance_status")
             Case 1
@@ -295,15 +315,8 @@ Finish:
 
     '系統管理-測試連線
     Private Sub btnTestConnect_Click(sender As Object, e As EventArgs) Handles btnTestConnect.Click
-        Dim connectString = $"Server={txtIP.Text};Port=5432;Database=cms;username=postgres;password={txtPsw.Text}"
-        Try
-            connect = New NpgsqlConnection(connectString)
-            connect.Open()
-            MsgBox("連接成功")
-        Catch ex As Exception
-            MsgBox(ex.Message)
-        End Try
-        connect.Close()
+        Dim sql As New PGSQL(txtIP.Text, txtUserName.Text, txtPsw.Text)
+        sql.TestConnect()
     End Sub
 
     '系統管理-儲存
